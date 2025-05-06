@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
+  <head>
+    <title>Chocolate Factory Quality Check</title>
+    <link rel="icon" type="image/x-icon" href="website_template/icon.png">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Montserrat"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <style>
+      body,
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-family: "Montserrat", sans-serif;
+      }
+      .w3-row-padding img {
+        margin-bottom: 12px;
+      }
+      .bgimg {
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-image: url("website_template/placeholder.jpg");
+        min-height: 100%;
+      }
+    </style>
+  
+<!--[if gte mso 9]><xml>
+<mso:CustomDocumentProperties>
+<mso:xd_Signature msdt:dt="string"></mso:xd_Signature>
+<mso:display_urn_x003a_schemas-microsoft-com_x003a_office_x003a_office_x0023_Editor msdt:dt="string">Larwig, Jan</mso:display_urn_x003a_schemas-microsoft-com_x003a_office_x003a_office_x0023_Editor>
+<mso:Order msdt:dt="string">6500.00000000000</mso:Order>
+<mso:ComplianceAssetId msdt:dt="string"></mso:ComplianceAssetId>
+<mso:TemplateUrl msdt:dt="string"></mso:TemplateUrl>
+<mso:xd_ProgID msdt:dt="string"></mso:xd_ProgID>
+<mso:_ExtendedDescription msdt:dt="string"></mso:_ExtendedDescription>
+<mso:display_urn_x003a_schemas-microsoft-com_x003a_office_x003a_office_x0023_Author msdt:dt="string">Larwig, Jan</mso:display_urn_x003a_schemas-microsoft-com_x003a_office_x003a_office_x0023_Author>
+<mso:ContentTypeId msdt:dt="string">0x010100C12E617427DC814690825D7572860C5B</mso:ContentTypeId>
+<mso:TriggerFlowInfo msdt:dt="string"></mso:TriggerFlowInfo>
+<mso:_SourceUrl msdt:dt="string"></mso:_SourceUrl>
+<mso:_SharedFileIndex msdt:dt="string"></mso:_SharedFileIndex>
+</mso:CustomDocumentProperties>
+</xml><![endif]-->
+</head>
+  <body onload="init()">
+    <nav class="w3-sidebar" style="width: 25%">
+      <div class="bgimg"></div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="w3-main w3-padding-large" style="margin-left: 25%">
+      <div class="w3-container">
+        <p>Chocolate Factory Quality Dashboard</p>
+        <p>The quality of our sweets is of the highest importance.</p>
+      </div>
+  
+      <div class="w3-container">
+        <div class="w3-half">
+          <h2 class="w3-text-grey">Camera Controller</h2>
+          <hr class="w3-opacity" />
+          <div id="webcam-container"></div>
+          <button class="w3-button w3-light-grey" style="width: 300px">
+            <i class="fa fa-camera"></i> Analyze
+          </button>
+          <div id="label-container"></div>
+          <div
+            class="w3-content w3-justify w3-text-grey"
+            id="prediction-bars"
+          ></div>
+        </div>
+
+        <!-- Completed Quality Checks Section -->
+        <div class="w3-half" id="completed-quality-checks">
+          <div class="w3-container">
+            <h2 class="w3-text-grey">Completed Quality Checks</h2>
+            <hr class="w3-opacity" />
+            <div
+              id="screenshot-container"
+              style="display: grid; grid-template-columns: 1fr 1fr 1fr"
+            ></div>
+          </div>
+        </div>
+        <!-- End Completed Quality Checks Section -->
+      </div>
+    </div>
+
+    <footer class="w3-container w3-light-gray w3-center w3-opacity">
+      <p class="w3-medium">Powered by Chocolate.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script type="text/javascript">
+      // More API functions here:
+      // https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/image
+
+      // the link to your model provided by Teachable Machine export panel
+      const URL = "./my_model/";
+
+      let model,
+        webcam,
+        labelContainer,
+        maxPredictions,
+        currentPrediction,
+        savedPredictions = [];
+
+      async function loop() {
+        updateCamera();
+        window.requestAnimationFrame(loop);
+      }
+    
+      async function save() {
+        // Gets the current image displayed on the webcam canvas
+        const img = webcam.canvas.toDataURL("image/png");
+
+        // @TODO
+        // 1. Get a document reference to the screenshot container
+        // (Hint: document.getElementById)
+
+        // 3. Use the parameters className and probability of each prediction
+        //    to generate valid prediction bars
+        let predictionBars = "";
+        currentPrediction.forEach(prediction => {
+          predictionBars += generatePredictionBars("Chocolate", 1)
+        });
+
+        // Generates html for a w3-card
+        const screenshot = generatePredictionCard(img, predictionBars);
+        
+        // 2. Store your the image (img) in the screenshot container.
+        //    Use the reference from step 1 to add an image to the innerHtml
+        //    of the container
+      }
+
+      function generateImageTag(img) {
+        return `<img src="${img}" alt="" style="width: 80%; height: auto;"/>`;
+      }
+
+      function generatePredictionBars(className, probability) {
+        return `<p class="w3-wide">${className}</p>` +
+               '<div style="width: 80%;"><div class="w3-light-grey">' +
+               '<div class="w3-container w3-center w3-padding-small w3-dark-grey" ' +
+               'style="width: ' + probability.toFixed(2) * 100 + '%">' + 
+               (probability * 100).toFixed(0) +"%</div>" +
+               "</div></div>";
+      }
+
+      function generatePredictionCard(img, predictionBars) {
+        return '<div class="w3-card w3-margin w3-padding-large w3-center">' +
+               `<p>${currentPrediction.timestamp}</p>` +
+               generateImageTag(img) +
+               predictionBars +
+               "</div>";
+      }
+
+      // run the webcam image through the image model
+      async function predict() {
+        const dt = new Date();
+
+        // predict can take in an image, video or canvas html element
+        currentPrediction = await model.predict(webcam.canvas);
+        currentPrediction.timestamp = `${dt.getHours()}:${dt.getMinutes()}:${dt.getSeconds()}`;
+
+
+        const predictionBars = document.getElementById("prediction-bars");
+        predictionBars.innerHTML = "";
+
+        // add a prediction bar for every class of the model
+        for (let i = 0; i < currentPrediction.length; i++) {
+          predictionBars.innerHTML +=
+            '<p id="className-' +
+            i +
+            '" class="w3-wide"></p>' +
+            '<div class="w3-light-grey">' +
+            '<div class="w3-container w3-center w3-padding-small w3-dark-grey" style="width: 100%" id="prediction-className-' +
+            i +
+            '"></div></div>';
+          document.getElementById("className-" + i).innerHTML =
+            currentPrediction[i].className;
+
+          const predictionClass = document.getElementById("prediction-className-" + i);
+          
+          predictionClass.innerHTML =
+            (currentPrediction[i].probability * 100).toFixed(0) + "%";
+          predictionClass.style =
+            "width:" + currentPrediction[i].probability.toFixed(2) * 100 + "%";
+        }
+      }
+
+      // Load the image model and setup the webcam
+      async function init() {
+        const modelURL = URL + "model.json";
+        const metadataURL = URL + "metadata.json";
+
+        // load the model and metadata
+        // Refer to tmImage.loadFromFiles() in the API to support files from a file picker
+        // or files from your local hard drive
+        // Note: the pose library adds "tmImage" object to your window (window.tmImage)
+        model = await tmImage.load(modelURL, metadataURL);
+        maxPredictions = model.getTotalClasses();
+
+        // Convenience function to setup a webcam
+        const flip = true; // whether to flip the webcam
+        webcam = new tmImage.Webcam(300, 300, flip); // width, height, flip
+        await webcam.setup(); // request access to the webcam
+        await webcam.play();
+        await window.requestAnimationFrame(await loop);
+
+        // append elements to the DOM
+        document.getElementById("webcam-container").appendChild(webcam.canvas);
+        labelContainer = document.getElementById("label-container");
+        for (let i = 0; i < maxPredictions; i++) {
+          // and class labels
+          labelContainer.appendChild(document.createElement("div"));
+        }
+      }
+
+      function updateCamera() {
+        webcam.update(); // update the webcam frame
+      }
+    </script>
+  </body>
+</html>
